@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PreSpend.Api.Domain.Entities;
+using PreSpend.Api.Infrastructure.Persistence.Seeders;
 
 namespace PreSpend.Api.Infrastructure.Persistence;
 
@@ -25,5 +26,6 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+        modelBuilder.SeedStableData();
     }
 }

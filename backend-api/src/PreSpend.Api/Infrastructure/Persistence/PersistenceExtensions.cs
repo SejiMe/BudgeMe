@@ -23,9 +23,7 @@ public static class PersistenceExtensions
             var postgresOptions = provider.GetRequiredService<IOptions<PostgresOptions>>().Value;
             var connectionString = postgresOptions.DefaultConnection ?? string.Empty;
 
-            options
-                .UseNpgsql(connectionString)
-                .UseSnakeCaseNamingConvention();
+            options.UsePreSpendNpgsql(connectionString);
         });
 
         return services;
