@@ -1,0 +1,16 @@
+.ai-workspace/
+.env
+.env.*
+!.env.example
+bin/
+obj/
+TestResults/
+*.user
+*.suo
+.vs/
+.idea/
+.vscode/
+node_modules/
+.expo/
+dist/
+coverage/

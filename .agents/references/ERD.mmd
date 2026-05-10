@@ -1,0 +1,250 @@
+erDiagram
+  AUTH_USERS ||--|| USERS : owns_profile
+  USERS ||--|| USER_FINANCIAL_PROFILES : has
+  USERS ||--o{ USER_AUTH_IDENTITIES : has
+  USERS ||--o{ ACTIVITIES : creates
+  USERS ||--o{ CASHFLOW_ENTRIES : records
+  USERS ||--o{ LINE_ITEMS : records
+  USERS ||--o{ CATEGORIES : creates_custom
+  USERS ||--o{ SPENDING_PLANS : owns
+  USERS ||--o{ SPENDING_PLAN_TEMPLATES : creates
+  USERS ||--o{ USER_INSIGHTS : receives
+  USERS ||--o{ USER_PROMPTS : receives
+  USERS ||--o{ USER_BEHAVIOR_METRICS : summarizes
+
+  CATEGORIES ||--o{ CASHFLOW_ENTRIES : categorizes
+  CATEGORIES ||--o{ LINE_ITEMS : categorizes
+  CATEGORIES ||--o{ SPENDING_PLAN_ITEMS : categorizes
+  CATEGORIES ||--o{ SPENDING_PLAN_TEMPLATE_ITEMS : categorizes
+
+  ACTIVITIES ||--o| SPENDING_PLANS : has_optional_plan
+  ACTIVITIES ||--o{ CASHFLOW_ENTRIES : may_group
+  ACTIVITIES ||--o{ LINE_ITEMS : may_detail
+  ACTIVITIES ||--o{ USER_INSIGHTS : generates
+  ACTIVITIES ||--o{ USER_PROMPTS : triggers
+
+  CASHFLOW_ENTRIES ||--o{ LINE_ITEMS : may_break_down
+
+  SPENDING_PLANS ||--o{ SPENDING_PLAN_ITEMS : contains
+  SPENDING_PLAN_ITEMS ||--o{ LINE_ITEMS : may_match_to
+
+  SPENDING_PLAN_TEMPLATES ||--o{ SPENDING_PLAN_TEMPLATE_ITEMS : contains
+  SPENDING_PLAN_TEMPLATES ||--o{ SPENDING_PLANS : may_create_from
+
+  INSIGHT_RULES ||--o{ USER_INSIGHTS : powers
+  PROMPT_TEMPLATES ||--o{ USER_PROMPTS : generates
+
+  AUTH_USERS {
+    uuid id PK
+    text email
+    timestamp created_at
+  }
+
+  USERS {
+    uuid id PK,FK
+    text full_name
+    text email
+    text avatar_url
+    char currency_code
+    text income_level
+    boolean family_support_flag
+    boolean onboarding_completed
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  USER_FINANCIAL_PROFILES {
+    uuid id PK
+    uuid user_id FK
+    text income_frequency
+    date next_expected_income_date
+    int payday_day_of_month
+    text timezone
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  USER_AUTH_IDENTITIES {
+    uuid id PK
+    uuid user_id FK
+    text provider
+    text provider_user_id
+    text provider_email
+    timestamp last_login_at
+    timestamp created_at
+  }
+
+  CATEGORIES {
+    uuid id PK
+    uuid user_id FK "nullable"
+    text name
+    text category_type
+    boolean is_system_default
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  ACTIVITIES {
+    uuid id PK
+    uuid user_id FK
+    text title
+    text activity_type
+    text trigger_type
+    date planned_date
+    date actual_date
+    text status
+    decimal planned_budget
+    text emotional_context
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  CASHFLOW_ENTRIES {
+    uuid id PK
+    uuid user_id FK
+    uuid activity_id FK "nullable"
+    text entry_type
+    decimal amount
+    uuid category_id FK
+    text income_type
+    text expense_type
+    text source_or_payee
+    text note
+    date entry_date
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  LINE_ITEMS {
+    uuid id PK
+    uuid user_id FK
+    uuid activity_id FK "nullable"
+    uuid cashflow_entry_id FK "nullable"
+    uuid spending_plan_item_id FK "nullable"
+    text line_type
+    text item_name
+    decimal amount
+    decimal quantity
+    uuid category_id FK "nullable"
+    boolean was_planned
+    text classification
+    text note
+    timestamp occurred_at
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  SPENDING_PLANS {
+    uuid id PK
+    uuid user_id FK
+    uuid activity_id FK
+    text title
+    text status
+    uuid created_from_template_id FK "nullable"
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  SPENDING_PLAN_ITEMS {
+    uuid id PK
+    uuid spending_plan_id FK
+    text item_name
+    text classification
+    int priority_level
+    decimal planned_amount
+    uuid category_id FK "nullable"
+    text note
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  SPENDING_PLAN_TEMPLATES {
+    uuid id PK
+    uuid user_id FK
+    text template_name
+    text activity_type
+    boolean is_system_default
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  SPENDING_PLAN_TEMPLATE_ITEMS {
+    uuid id PK
+    uuid template_id FK
+    text item_name
+    text classification
+    int priority_level
+    decimal estimated_amount
+    uuid category_id FK "nullable"
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  INSIGHT_RULES {
+    uuid id PK
+    text rule_code
+    text rule_name
+    text description
+    text severity
+    boolean is_active
+  }
+
+  USER_INSIGHTS {
+    uuid id PK
+    uuid user_id FK
+    uuid activity_id FK
+    uuid rule_id FK
+    text insight_title
+    text insight_message
+    text severity
+    jsonb metadata
+    timestamp created_at
+    timestamp seen_at
+    timestamp updated_at
+  }
+
+  PROMPT_TEMPLATES {
+    uuid id PK
+    text trigger_code
+    text prompt_type
+    text message_template
+    text severity
+    boolean is_active
+    timestamp created_at
+  }
+
+  USER_PROMPTS {
+    uuid id PK
+    uuid user_id FK
+    uuid prompt_template_id FK
+    uuid related_activity_id FK
+    text prompt_type
+    text message
+    text status
+    timestamp scheduled_for
+    timestamp delivered_at
+    timestamp seen_at
+    timestamp acted_at
+    timestamp dismissed_at
+    text action_taken
+    jsonb metadata
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  USER_BEHAVIOR_METRICS {
+    uuid id PK
+    uuid user_id FK
+    text period_type
+    date period_start
+    date period_end
+    int audits_created_count
+    int activities_completed_count
+    decimal planned_spending_total
+    decimal actual_spending_total
+    int impulse_purchase_count
+    decimal impulse_purchase_total
+    int neglected_essential_count
+    timestamp created_at
+    timestamp updated_at
+  }
